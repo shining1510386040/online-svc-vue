@@ -1,22 +1,54 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Home from '../views/Home.vue'
+// import Home from '../views/Home.vue'
+import NotFound from '@/components/error/notFound.vue'
+import Login from '@/components/login/login.vue'
+import HOME from '@/views/home/index.vue' //主页
+import WorkOrderAdd from '@/components/workorder/WorkOrderAdd.vue'
+import WorkOrderAddStep1 from '@/components/workorder/WorkOrderAddStep1.vue'
+
+import WorkOrderAddStep2 from '@/components/workorder/WorkOrderAddStep2.vue'
+import WorkOrderAddStep4 from '@/components/workorder/workOrderAddStep4.vue'
+import WorkOrderList from '@/components/workorder/WorkOrderList.vue'
 
 Vue.use(VueRouter)
 
 const routes = [
   {
-    path: '/',
-    name: 'Home',
-    component: Home
+    path: '/toLogin',
+    component: Login
   },
   {
-    path: '/about',
-    name: 'About',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
+    path: '/',
+    component: HOME,
+    children: [
+      {
+        path: '/workOrder/add',
+        component: WorkOrderAdd,
+        children:[{
+          path:"/workOrder/add/step1",
+          component:WorkOrderAddStep1
+        },{
+          path:"/workOrder/add/step2",
+          component:WorkOrderAddStep2
+        },{
+          path:"/step3",
+          component:WorkOrderAddStep1
+        },{
+          path:"/workOrder/add/step4",
+          component:WorkOrderAddStep4
+        }]
+      },
+      {
+        path: '/workOrder/list',
+        component: WorkOrderList
+      },
+    ]
+  },
+
+  { // 404页面：必须位于最后，否则其它的路由地址都会使用 NotFound 组件
+    path: '*',
+    component: NotFound
   }
 ]
 
