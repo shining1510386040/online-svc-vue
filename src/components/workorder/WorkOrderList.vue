@@ -91,6 +91,20 @@
             删除
           </el-button>
           <el-button
+            @click.native.prevent="feedback(scope.$index, tableData)"
+            type="text"
+            size="small"
+          >
+            提交反馈
+          </el-button>
+          <el-button
+            @click.native.prevent="replay(scope.$index, tableData)"
+            type="text"
+            size="small"
+          >
+            反馈回复
+          </el-button>
+          <el-button
             @click.native.prevent="evaluate(scope.$index, tableData)"
             type="text"
             size="small"
@@ -129,6 +143,7 @@
 // 引入封装的axios
 import axios from "@/utils/axios";
 import qs from "qs";
+import QueryString from "qs";
 
 // import { getQueryString } from "@/utils/common.js";
 
@@ -143,6 +158,7 @@ function getQueryString(name) {
 export default {
   data() {
     return {
+      status: this.$route.query.status,
       tableData: [],
       searchFormData: {
         workOrderNo: "",
@@ -189,7 +205,7 @@ export default {
     let params = new Object();
     params.pageNo = this.currentPage;
     params.pageSize = this.pageSize;
-    params.status = getQueryString("status");
+    params.status = this.status;
     this.getTableData(params);
   },
   methods: {
@@ -212,18 +228,81 @@ export default {
         }
       });
     },
-    // 查看
+    // 提交反馈
+    feedback(index, rows) {
+      let id = rows[index].id;
+      // console.log(id);
+      // console.log(this);
+      this.$router.push({
+        path: "/workOrder/feedback",
+        query: {
+          id: id,
+        },
+      });
+    },
+    // 反馈回复
+    replay(index, rows) {
+      let communicateRecordList = rows[index].communicateRecordList;
+      console.log(rows[index]);
+      // console.log(this);
+      this.$router.push({
+        path: "/workOrder/replay",
+        query: {
+          communicateRecordList: communicateRecordList,
+        },
+      });
+    },
+
+    // 查看详情
     showDetail(index, rows) {
-      // todo
-      console.log(rows);
+      let id = rows[index].id;
+      // console.log(id);
+      // console.log(this);
+      // 跳转到详情页面
+      this.$router.push({
+        path: "/workOrder/detail",
+        query: {
+          id: id,
+        },
+      });
     },
     // 解决和关闭工单
     solveAndClose(index, rows) {
-      // todo
+      let id = rows[index].id;
+      // console.log(id);
+      // console.log(this);
+      // 跳转到提交解决方案页面
+      this.$router.push({
+        path: "/workOrder/solution",
+        query: {
+          id: id,
+        },
+      });
     },
     // 评价
     evaluate(index, rows) {
-      // todo
+      let params = new Object();
+      params.id = rows[index].id;
+
+      this.$prompt("请输入您的评价", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+      })
+        .then(({ value }) => {
+          params.evaluation = value;
+          // 更新评价内容
+          axios
+            .post("/workOrder/evaluation", qs.stringify(params))
+            .then((result) => {
+              if (result.status == 200) {
+                this.$message({
+                  type: "success",
+                  message: result.data.returnInfo,
+                });
+              }
+            });
+        })
+        .catch(() => {});
     },
     // 加载数据表格
     getTableData(params) {

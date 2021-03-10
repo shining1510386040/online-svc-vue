@@ -8,7 +8,7 @@
             <template slot="title"
               ><i class="el-icon-message"></i>工单</template
             >
-            <el-menu-item index="/workOrder/add">
+            <el-menu-item index="/workOrder/add/step1">
               <i class="el-icon-document-add"></i>提交工单
             </el-menu-item>
             <el-menu-item-group>
@@ -44,10 +44,13 @@
         <!-- 右侧头 -->
         <el-header style="text-align: right; font-size: 12px">
           <el-breadcrumb separator-class="el-icon-arrow-right">
-            <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
-            <el-breadcrumb-item>活动管理</el-breadcrumb-item>
-            <el-breadcrumb-item>活动列表</el-breadcrumb-item>
-            <el-breadcrumb-item>活动详情</el-breadcrumb-item>
+            <el-breadcrumb-item
+              v-for="(item, index) in list[0].meta"
+              :key="index"
+              :to="item.url"
+            >
+              {{ item.title }}
+            </el-breadcrumb-item>
           </el-breadcrumb>
         </el-header>
         <!-- 右侧body -->
@@ -68,7 +71,92 @@
 </template>
 
 <script>
-export default {};
+export default {
+  data() {
+    return {
+      list: [],
+    };
+  },
+  methods: {
+    //如果用户重新刷新页面，因为页面刷新$route没有变化(监听不到)所以要在页面刚进入的时候判断一下当前路由路径(然后再一次渲染)
+    getMatched() {
+      this.list = this.$route.matched;
+      console.log(this.$route);
+      if (this.$route.fullPath == "/workOrder/list?status=0") {
+        this.list[0].meta = [
+          { title: "工单" },
+          { title: "我的服务记录" },
+          { title: "所有工单", url: "/workOrder/list?status=0" },
+        ];
+      }  else if (this.$route.path == "/workOrder/add/step1") {
+        this.list[0].meta = [
+          { title: "工单" },
+          { title: "提交工单", url: "/workOrder/add/step1" },
+        ];
+      } else if (this.$route.path == "/workOrder/add/step2") {
+        this.list[0].meta = [
+          { title: "工单" },
+          { title: "提交工单", url: "/workOrder/add/step2" },
+        ];
+      } else if (this.$route.path == "/workOrder/add/step4") {
+        this.list[0].meta = [
+          { title: "工单" },
+          { title: "提交工单", url: "/workOrder/add/step4" },
+        ];
+      } else if (this.$route.fullPath == "/workOrder/list?status=1") {
+        this.list[0].meta = [
+          { title: "工单" },
+          { title: "我的服务记录" },
+          { title: "未完成工单", url: "/workOrder/list?status=1" },
+        ];
+      } else if (this.$route.fullPath == "/workOrder/list?status=2") {
+        this.list[0].meta = [
+          { title: "工单" },
+          { title: "我的服务记录" },
+          { title: "已关闭的工单", url: "/workOrder/list?status=2" },
+        ];
+      }
+    },
+  },
+  created() {
+    this.getMatched();
+  },
+  mounted() {},
+  watch: {
+    $route(to, from) {
+      console.log(from); //从哪来
+      console.log(to); //到哪去
+      if (to.fullPath == "/workOrder/list?status=0") {
+        this.list[0].meta = [
+          { title: "工单" },
+          { title: "我的服务记录" },
+          { title: "所有工单", url: "/workOrder/list?status=0" },
+        ];
+      } else if (
+        to.path == "/workOrder/add/step1" ||
+        to.path == "/workOrder/add/step2" ||
+        to.path == "/workOrder/add/step4"
+      ) {
+        this.list[0].meta = [
+          { title: "工单" },
+          { title: "提交工单", url: "/workOrder/add/step1" },
+        ];
+      } else if (to.fullPath == "/workOrder/list?status=1") {
+        this.list[0].meta = [
+          { title: "工单" },
+          { title: "我的服务记录" },
+          { title: "未完成工单", url: "/workOrder/list?status=1" },
+        ];
+      } else if (to.fullPath == "/workOrder/list?status=2") {
+        this.list[0].meta = [
+          { title: "工单" },
+          { title: "我的服务记录" },
+          { title: "已关闭的工单", url: "/workOrder/list?status=2" },
+        ];
+      }
+    },
+  },
+};
 </script>
 
 <style scoped>
