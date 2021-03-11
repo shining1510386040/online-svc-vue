@@ -16,7 +16,6 @@
 </template>
  
 <script>
-import store from '../../store/store'
 export default {
   data() {
     var validateUsername = (rule, value, callback) => {
@@ -53,7 +52,7 @@ export default {
     onLogin(event) {
       this.$refs.loginForm.validate((valid) => {
         if (valid) {
-          store.state.username = this.loginForm.username;
+          // store.state.username = this.loginForm.username;
           this.$router.push('/');
         } else {
           console.log('error submit!!');

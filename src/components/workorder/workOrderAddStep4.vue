@@ -30,12 +30,11 @@
           ></el-input>
           <!-- <el-input v-model="selectData.categoryName" :disabled="true"></el-input> -->
         </el-form-item>
-        <el-form-item label="优先级">
+        <el-form-item label="优先级" prop="workOrderType">
           <el-radio-group v-model="selectData.workOrderType">
-            <el-radio name="workOrderType" label="0">重要</el-radio>
-            <el-radio name="workOrderType" label="1">普通</el-radio>
+            <el-radio :label="0">重要</el-radio>
+            <el-radio :label="1">普通</el-radio>
           </el-radio-group>
-          <!-- <div>加急处理：查看详情</div> -->
         </el-form-item>
         <el-form-item label="问题描述">
           <el-input
@@ -62,8 +61,14 @@ import qs from "qs";
 export default {
   data() {
     return {
-      active:4,
-      selectData: {},
+      active: 4,
+      selectData: {
+        categoryId: "603cd0f7b399c319e47eaa3a",
+        categoryName: "服务响应慢",
+        productId: "603cd092b399c319e47eaa33",
+        productName: "市场云",
+        workOrderType: 0,
+      },
     };
   },
   mounted() {
@@ -88,8 +93,13 @@ export default {
     // 初始化数据
     initData() {
       // 获取路由传递的参数
-      this.selectData = this.$route.query.selectData;
+      let params = this.$route.query.selectData;
+      this.selectData.categoryId = params.categoryId;
+      this.selectData.categoryName = params.categoryName;
+      this.selectData.productId = params.productId;
+      this.selectData.productName = params.productName;
       this.selectData.workOrderType = 0;
+      console.log(this.selectData);
     },
   },
 };

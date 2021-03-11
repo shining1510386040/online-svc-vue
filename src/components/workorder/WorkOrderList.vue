@@ -94,6 +94,7 @@
             @click.native.prevent="feedback(scope.$index, tableData)"
             type="text"
             size="small"
+            v-if="clientOpShow"
           >
             提交反馈
           </el-button>
@@ -101,6 +102,7 @@
             @click.native.prevent="replay(scope.$index, tableData)"
             type="text"
             size="small"
+            v-if="postsaleOpShow"
           >
             反馈回复
           </el-button>
@@ -108,6 +110,7 @@
             @click.native.prevent="evaluate(scope.$index, tableData)"
             type="text"
             size="small"
+            v-if="clientOpShow"
           >
             评价
           </el-button>
@@ -115,6 +118,7 @@
             @click.native.prevent="solveAndClose(scope.$index, tableData)"
             type="text"
             size="small"
+            v-if="postsaleOpShow"
           >
             关闭工单
           </el-button>
@@ -144,6 +148,7 @@
 import axios from "@/utils/axios";
 import qs from "qs";
 import QueryString from "qs";
+import store from "@/store/index";
 
 // import { getQueryString } from "@/utils/common.js";
 
@@ -158,13 +163,17 @@ function getQueryString(name) {
 export default {
   data() {
     return {
-      status: this.$route.query.status,
+      status: getQueryString("status"),
       tableData: [],
       searchFormData: {
         workOrderNo: "",
         submitTime: [],
       },
       currentPage: 1,
+      // 客户操作按钮显示
+      clientOpShow: false,
+      // 售后工程师操作按钮显示
+      postsaleOpShow: false,
       total: 400,
       pageSize: 50,
       pickerOptions: {
@@ -207,6 +216,59 @@ export default {
     params.pageSize = this.pageSize;
     params.status = this.status;
     this.getTableData(params);
+
+    // 设置操作按钮显示
+    let loginType = localStorage.getItem("loginType");
+    if (loginType == "client") {
+      // 客户
+      this.clientOpShow = true;
+      this.postsaleOpShow = false;
+    } else {
+      this.clientOpShow = false;
+      this.postsaleOpShow = true;
+    }
+  },
+  //   .执行到它的时候时候是数据发生变化且界面更新完毕
+  // .所有的数据发生变化都会调用
+  // .每次触发的代码都是同一个
+  updated() {
+    // // status 数据更新之后，重新加载数据表格（触发一次）
+    // var flag = true;
+    // if (flag) {
+    //   let params = new Object();
+    //   params.pageNo = this.currentPage;
+    //   params.pageSize = this.pageSize;
+    //   params.status = this.status;
+    //   this.getTableData(params);
+    //   flag = false;
+    // } else {
+    //   return;
+    // }
+  },
+  // 数据发生改变的时候会侦听到
+  watch: {
+    //监听status数据的变化
+    status(newVal,oldVal){
+      let params = new Object();
+      params.pageNo = this.currentPage;
+      params.pageSize = this.pageSize;
+      params.status = this.status;
+      this.getTableData(params);
+    },
+    // 监听路由url变化
+    "$route.fullPath": function (newPath, oldPath) {
+      console.log("oldPath:" + oldPath);
+      console.log("newPath:" + newPath);
+      // // 当前页面刷新一次
+      // if (location.href.indexOf("#reloaded") == -1 && newPath.includes("status=")) {
+      //   location.href = location.href + "#reloaded";
+      //   // 更新vuex中loginType的值
+      //   //  this.$store.dispatch("updateUserinfo", localStorage.getItem("loginType"));
+      //   location.reload();
+      // }
+      // 设置为新路由的status值
+      this.status = getQueryString("status");
+    },
   },
   methods: {
     // 删除
@@ -242,13 +304,14 @@ export default {
     },
     // 反馈回复
     replay(index, rows) {
-      let communicateRecordList = rows[index].communicateRecordList;
+      // let communicateRecordList = rows[index].communicateRecordList;
+      let id = rows[index].id;
       console.log(rows[index]);
       // console.log(this);
       this.$router.push({
         path: "/workOrder/replay",
         query: {
-          communicateRecordList: communicateRecordList,
+          id: id,
         },
       });
     },
@@ -352,7 +415,7 @@ export default {
       let params = new Object();
       params.pageNo = this.currentPage;
       params.pageSize = this.pageSize;
-      params.status = getQueryString("status");
+      params.status = this.status;
       params.workOrderNo = this.searchFormData.workOrderNo;
       if (null != this.searchFormData.submitTime) {
         params.submitTimeStart = this.searchFormData.submitTime[0];

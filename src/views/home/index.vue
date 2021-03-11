@@ -1,42 +1,16 @@
 <template>
   <body>
-    <el-container>
+    <el-container :style="{ minHeight: minHeight + 'px' }">
       <!-- 左侧 -->
       <el-aside width="200px" style="background-color: rgb(238, 241, 246)">
-        <el-menu :default-openeds="['1']" router>
-          <el-submenu index="1">
-            <template slot="title"
-              ><i class="el-icon-message"></i>工单</template
-            >
-            <el-menu-item index="/workOrder/add/step1">
-              <i class="el-icon-document-add"></i>提交工单
-            </el-menu-item>
-            <el-menu-item-group>
-              <template slot="title">我的服务记录</template>
-
-              <el-menu-item index="/workOrder/list?status=0"
-                ><i class="el-icon-document"></i>所有工单
-              </el-menu-item>
-              <el-menu-item index="/workOrder/list?status=1">
-                <i class="el-icon-document"></i>未完成的工单
-              </el-menu-item>
-              <el-menu-item index="/workOrder/list?status=2">
-                <i class="el-icon-document-delete"></i
-                >已关闭的工单</el-menu-item
-              >
-            </el-menu-item-group>
-            <el-menu-item-group title="分组2">
-              <el-menu-item index="1-3">选项3</el-menu-item>
-            </el-menu-item-group>
-          </el-submenu>
-          <el-submenu index="2">
-            <template slot="title"><i class="el-icon-menu"></i>导航二</template>
-            <el-menu-item-group>
-              <template slot="title">分组一</template>
-              <el-menu-item index="2-1">选项1</el-menu-item>
-              <el-menu-item index="2-2">选项2</el-menu-item>
-            </el-menu-item-group>
-          </el-submenu>
+        <el-menu
+          :background-color="menuBgColor"
+          text-color="#555D6D"
+          active-text-color="#5DA1FF"
+          :default-active="activePath"
+          @select="selectMenu"
+        >
+          <Menutree :data="menuList" :active="menuSelect" />
         </el-menu>
       </el-aside>
       <!-- 右侧 -->
@@ -45,7 +19,7 @@
         <el-header style="text-align: right; font-size: 12px">
           <el-breadcrumb separator-class="el-icon-arrow-right">
             <el-breadcrumb-item
-              v-for="(item, index) in list[0].meta"
+              v-for="(item, index) in breadcrumbData"
               :key="index"
               :to="item.url"
             >
@@ -58,76 +32,218 @@
       </el-main>
     </el-container>
     <!-- 底部 -->
-    <!-- <el-footer>
-      <div>
+    <el-footer>
+      <div class="foot1" style="text-align: center;background-color:rgb(241, 237, 237);">
         <span>
           增值电信业务许可证: 京B2-20170892 ©
           版权所有：北京神州云动科技股份有限公司 京ICP备09016255-2号 京ICP证
           110683号 京公网安备110108008174号
         </span>
       </div>
-    </el-footer> -->
+    </el-footer>
   </body>
 </template>
 
 <script>
+import Menutree from "@/components/MenuTree.vue";
+// 缓存
+import store from "@/store/index";
+
 export default {
+  components: { Menutree },
+  props: {
+    menuBgColor: {
+      type: String,
+      default: "#F3F6F9",
+    },
+  },
   data() {
     return {
-      list: [],
+      //当前所在菜单
+      activePath: this.$route.path,
+      //选择的菜单
+      menuSelect: "",
+      // 菜单数据
+      menuList: [],
+      // 面包屑数据
+      breadcrumbData: [],
+      minHeight: 0,
     };
+  },
+  updated() {
+    this.$nextTick(() => {
+      this.setActivePath(this.menuList, this.$route.name);
+    });
   },
   methods: {
     //如果用户重新刷新页面，因为页面刷新$route没有变化(监听不到)所以要在页面刚进入的时候判断一下当前路由路径(然后再一次渲染)
     getMatched() {
-      this.list = this.$route.matched;
+      this.breadcrumbData = this.$route.matched[0].meta;
       console.log(this.$route);
       if (this.$route.fullPath == "/workOrder/list?status=0") {
-        this.list[0].meta = [
+        this.breadcrumbData = [
           { title: "工单" },
           { title: "我的服务记录" },
           { title: "所有工单", url: "/workOrder/list?status=0" },
         ];
-      }  else if (this.$route.path == "/workOrder/add/step1") {
-        this.list[0].meta = [
+      } else if (this.$route.path == "/workOrder/add/step1") {
+        this.breadcrumbData = [
           { title: "工单" },
           { title: "提交工单", url: "/workOrder/add/step1" },
         ];
       } else if (this.$route.path == "/workOrder/add/step2") {
-        this.list[0].meta = [
+        this.breadcrumbData = [
           { title: "工单" },
           { title: "提交工单", url: "/workOrder/add/step2" },
         ];
       } else if (this.$route.path == "/workOrder/add/step4") {
-        this.list[0].meta = [
+        this.breadcrumbData = [
           { title: "工单" },
           { title: "提交工单", url: "/workOrder/add/step4" },
         ];
       } else if (this.$route.fullPath == "/workOrder/list?status=1") {
-        this.list[0].meta = [
+        this.breadcrumbData = [
           { title: "工单" },
           { title: "我的服务记录" },
           { title: "未完成工单", url: "/workOrder/list?status=1" },
         ];
       } else if (this.$route.fullPath == "/workOrder/list?status=2") {
-        this.list[0].meta = [
+        this.breadcrumbData = [
           { title: "工单" },
           { title: "我的服务记录" },
           { title: "已关闭的工单", url: "/workOrder/list?status=2" },
         ];
       }
     },
+    setActivePath(links, path) {
+      links.some((item, index) => {
+        if (path === item.path) {
+          this.activePath = item.path + "," + item.permissionId;
+          return true;
+        }
+        if (item.actives) {
+          if (item.actives.indexOf(path) > -1) {
+            this.activePath = item.path + "," + item.permissionId;
+            return true;
+          }
+        }
+        if (item.children && item.children.length) {
+          this.setActivePath(item.children, path);
+        }
+        return false;
+      });
+    },
+    selectMenu(item, indexPath) {
+      this.menuSelect = item;
+      const arr = item.split(",");
+      if (arr[0] !== "undefined") {
+        console.log(arr);
+        this.$router.push({ path: arr[0] });
+      }
+    },
+    caculateHeight() {
+      this.minHeight = document.documentElement.clientHeight - 80;
+      var that = this;
+      window.onresize = function () {
+        that.minHeight = document.documentElement.clientHeight - 80;
+      };
+    },
   },
   created() {
     this.getMatched();
   },
-  mounted() {},
+  mounted() {
+    this.caculateHeight();
+    // 若请求路由fullpath中包含loginType则赋值
+    if (this.$route.fullPath.includes("loginType")) {
+      // store.state.loginType = this.$route.query.loginType;
+      // this.$store.commit("setUserInfo", this.$route.query.loginType);
+      localStorage.setItem("loginType", this.$route.query.loginType);
+    }
+    // this.$store.dispatch("updateUserinfo",this.$route.query.loginType);
+    // console.log("====>store.state.loginType:" + store.state.loginType);
+    // 根据loginType 渲染不同的菜单（权限）
+    let loginType = localStorage.getItem("loginType");
+    if (loginType == "client") {
+      // 客户
+      this.menuList = [
+        {
+          path: "/workOrder/add/step1",
+          title: "提交工单",
+          icon: "",
+          children: [],
+        },
+        {
+          path: "",
+          title: "我的服务记录",
+          icon: "",
+          children: [
+            {
+              path: "/workOrder/list?status=0",
+              title: "所有工单",
+              icon: "",
+            },
+            {
+              path: "/workOrder/list?status=1",
+              title: "未完成的工单",
+              icon: "",
+            },
+            {
+              path: "/workOrder/list?status=2",
+              title: "已关闭的工单",
+              icon: "",
+            },
+          ],
+        },
+      ];
+    } else {
+      // 售后工程是 postsale
+      this.menuList = [
+        {
+          path: "",
+          title: "我的服务记录",
+          icon: "",
+          children: [
+            {
+              path: "/workOrder/list?status=0",
+              title: "所有工单",
+              icon: "",
+            },
+            {
+              path: "/workOrder/list?status=1",
+              title: "未完成的工单",
+              icon: "",
+            },
+            {
+              path: "/workOrder/list?status=2",
+              title: "已关闭的工单",
+              icon: "",
+            },
+          ],
+        },
+      ];
+    }
+  },
   watch: {
+    // 监听路由，处理面包屑
     $route(to, from) {
       console.log(from); //从哪来
       console.log(to); //到哪去
-      if (to.fullPath == "/workOrder/list?status=0") {
-        this.list[0].meta = [
+      // 处理工单列表刷新
+      // 当前页面刷新一次
+      // if (
+      //   location.href.indexOf("#reloaded") == -1 &&
+      //   to.fullPath.includes("status=")
+      // ) {
+      //   location.href = location.href + "#reloaded";
+      //   // 更新vuex中loginType的值
+      //   //  this.$store.dispatch("updateUserinfo", localStorage.getItem("loginType"));
+      //   location.reload();
+      // }
+      // 处理面包屑
+      // 包含
+      if (to.fullPath.includes("/workOrder/list?status=0")) {
+        this.breadcrumbData = [
           { title: "工单" },
           { title: "我的服务记录" },
           { title: "所有工单", url: "/workOrder/list?status=0" },
@@ -137,18 +253,18 @@ export default {
         to.path == "/workOrder/add/step2" ||
         to.path == "/workOrder/add/step4"
       ) {
-        this.list[0].meta = [
+        this.breadcrumbData = [
           { title: "工单" },
           { title: "提交工单", url: "/workOrder/add/step1" },
         ];
-      } else if (to.fullPath == "/workOrder/list?status=1") {
-        this.list[0].meta = [
+      } else if (to.fullPath.includes("/workOrder/list?status=1")) {
+        this.breadcrumbData = [
           { title: "工单" },
           { title: "我的服务记录" },
           { title: "未完成工单", url: "/workOrder/list?status=1" },
         ];
-      } else if (to.fullPath == "/workOrder/list?status=2") {
-        this.list[0].meta = [
+      } else if (to.fullPath.includes("/workOrder/list?status=2")) {
+        this.breadcrumbData = [
           { title: "工单" },
           { title: "我的服务记录" },
           { title: "已关闭的工单", url: "/workOrder/list?status=2" },
@@ -159,5 +275,42 @@ export default {
 };
 </script>
 
-<style scoped>
+<style lang="scss">
+.el-submenu {
+  .is-active {
+    border-right: 3px solid #3d7169;
+  }
+  .el-menu-item {
+    height: 40px !important;
+    line-height: 40px !important;
+
+    &:hover {
+      background-color: #f3f6f9 !important;
+    }
+  }
+  .el-submenu__title {
+    &:hover {
+      background-color: #f3f6f9 !important;
+    }
+    .el-submenu__icon-arrow {
+      color: #b4b8c5;
+    }
+  }
+}
+.menuTree {
+  .el-menu-item {
+    height: 50px;
+    line-height: 50px;
+    box-sizing: border-box;
+  }
+  .el-submenu__title {
+    height: 50px;
+    line-height: 50px;
+    box-sizing: border-box;
+  }
+.foot1{
+  text-align: center;
+  background-color: rgb(241, 237, 237);
+}
+}
 </style>
