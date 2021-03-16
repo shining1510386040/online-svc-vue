@@ -1,6 +1,6 @@
 <template>
   <body>
-    <el-container :style="{ minHeight: minHeight + 'px' }">
+    <el-container class="topAndMain">
       <!-- 左侧 -->
       <el-aside width="200px" style="background-color: rgb(238, 241, 246)">
         <el-menu
@@ -32,15 +32,14 @@
       </el-main>
     </el-container>
     <!-- 底部 -->
-    <el-footer>
-      <div class="foot1" style="text-align: center;background-color:rgb(241, 237, 237);">
-        <span>
-          增值电信业务许可证: 京B2-20170892 ©
-          版权所有：北京神州云动科技股份有限公司 京ICP备09016255-2号 京ICP证
-          110683号 京公网安备110108008174号
-        </span>
-      </div>
-    </el-footer>
+
+    <div class="foot1">
+      <span>
+        增值电信业务许可证: 京B2-20170892 ©
+        版权所有：北京神州云动科技股份有限公司 京ICP备09016255-2号 京ICP证
+        110683号 京公网安备110108008174号
+      </span>
+    </div>
   </body>
 </template>
 
@@ -72,7 +71,7 @@ export default {
   },
   updated() {
     this.$nextTick(() => {
-      this.setActivePath(this.menuList, this.$route.name);
+      this.setActivePath(this.menuList, this.$route.path);
     });
   },
   methods: {
@@ -85,6 +84,11 @@ export default {
           { title: "工单" },
           { title: "我的服务记录" },
           { title: "所有工单", url: "/workOrder/list?status=0" },
+        ];
+      } else if (this.$route.path == "/workOrder/add") {
+        this.breadcrumbData = [
+          { title: "工单" },
+          { title: "提交工单", url: "/workOrder/add" },
         ];
       } else if (this.$route.path == "/workOrder/add/step1") {
         this.breadcrumbData = [
@@ -141,6 +145,7 @@ export default {
         this.$router.push({ path: arr[0] });
       }
     },
+    // 底部footerdiv紧靠底部，动态计算其兄弟div的高度
     caculateHeight() {
       this.minHeight = document.documentElement.clientHeight - 80;
       var that = this;
@@ -153,7 +158,7 @@ export default {
     this.getMatched();
   },
   mounted() {
-    this.caculateHeight();
+    // this.caculateHeight();
     // 若请求路由fullpath中包含loginType则赋值
     if (this.$route.fullPath.includes("loginType")) {
       // store.state.loginType = this.$route.query.loginType;
@@ -164,11 +169,38 @@ export default {
     // console.log("====>store.state.loginType:" + store.state.loginType);
     // 根据loginType 渲染不同的菜单（权限）
     let loginType = localStorage.getItem("loginType");
-    if (loginType == "client") {
+    if (loginType == "postsale") {
+      // 售后工程师 postsale
+      this.menuList = [
+        {
+          path: "",
+          title: "我的服务记录",
+          icon: "",
+          children: [
+            {
+              path: "/workOrder/list?status=0",
+              title: "所有工单",
+              icon: "",
+            },
+            {
+              path: "/workOrder/list?status=1",
+              title: "未完成的工单",
+              icon: "",
+            },
+            {
+              path: "/workOrder/list?status=2",
+              title: "已关闭的工单",
+              icon: "",
+            },
+          ],
+        },
+      ];
+    } else {
       // 客户
       this.menuList = [
         {
-          path: "/workOrder/add/step1",
+          // path: "/workOrder/add/step1",
+          path: "/workOrder/add",
           title: "提交工单",
           icon: "",
           children: [],
@@ -196,32 +228,21 @@ export default {
           ],
         },
       ];
-    } else {
-      // 售后工程是 postsale
-      this.menuList = [
-        {
-          path: "",
-          title: "我的服务记录",
-          icon: "",
-          children: [
-            {
-              path: "/workOrder/list?status=0",
-              title: "所有工单",
-              icon: "",
-            },
-            {
-              path: "/workOrder/list?status=1",
-              title: "未完成的工单",
-              icon: "",
-            },
-            {
-              path: "/workOrder/list?status=2",
-              title: "已关闭的工单",
-              icon: "",
-            },
-          ],
+    }
+    // 初次跳转到主页默认显示我的工单
+    if (
+      this.$route.fullPath.includes("loginType") ||
+      this.$route.fullPath == "/"
+    ) {
+      // 默认显示我的工单
+      this.$router.push({
+        path: "/workOrder/list",
+        query: {
+          status: 0,
         },
-      ];
+      });
+      // 设置选择的菜单
+      this.setActivePath(this.menuList, "/workOrder/list?status=0");
     }
   },
   watch: {
@@ -247,6 +268,11 @@ export default {
           { title: "工单" },
           { title: "我的服务记录" },
           { title: "所有工单", url: "/workOrder/list?status=0" },
+        ];
+      } else if (to.path == "/workOrder/add") {
+        this.breadcrumbData = [
+          { title: "工单" },
+          { title: "提交工单", url: "/workOrder/add" },
         ];
       } else if (
         to.path == "/workOrder/add/step1" ||
@@ -308,9 +334,17 @@ export default {
     line-height: 50px;
     box-sizing: border-box;
   }
-.foot1{
+}
+
+.foot1 {
+  position: fixed;
+  bottom: 0;
+  width: 100vw;
+  margin: 0 auto;
   text-align: center;
   background-color: rgb(241, 237, 237);
 }
+.topAndMain {
+  height: 48vw;
 }
 </style>

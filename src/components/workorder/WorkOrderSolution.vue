@@ -31,7 +31,7 @@
       </section>
     </div>
     <div class="communicate">
-      <el-card class="box-card">
+      <el-card class="box-card" shadow="never">
         <div slot="header" class="clearfix">
           <span>提交解决方案</span>
         </div>
@@ -40,18 +40,20 @@
             :model="solutionForm"
             :rules="rules"
             ref="solutionForm"
-            label-width="100px"
+            label-width="130px"
             class="demo-ruleForm"
           >
             <el-form-item label="解决方案标题" prop="solutionTitle">
               <el-input
                 type="textarea"
+                rows="3"
                 v-model="solutionForm.solutionTitle"
               ></el-input>
             </el-form-item>
             <el-form-item label="解决方案内容" prop="solutionContent">
               <el-input
                 type="textarea"
+                rows="3"
                 v-model="solutionForm.solutionContent"
               ></el-input>
             </el-form-item>
@@ -79,7 +81,7 @@
 import axios from "@/utils/axios";
 import qs from "qs";
 
-import { formatDate } from "@/utils/common.js";
+import {workOrderStatusConvert, formatDate } from "@/utils/common.js";
 
 export default {
   data() {
@@ -89,7 +91,9 @@ export default {
       active: 3,
       workOrderData: {},
       solutionForm: {
-        isRecommended: 0,
+        solutionTitle:"",
+        solutionContent:"",
+        isRecommended: "1",
       },
       rules: {
         solutionTitle: [
@@ -111,7 +115,7 @@ export default {
           amount2: "工单编号",
           amount3: this.workOrderData.workOrderNo,
           amount4: "工单类型",
-          amount5: this.workOrderData.workOrderType,
+          amount5: this.workOrderData.workOrderType == 0 ? "重要工单" : "普通工单",
         },
         {
           name: "提交账号",
@@ -122,7 +126,7 @@ export default {
             "yyyy-MM-dd hh:mm:ss"
           ),
           amount4: "状态",
-          amount5: this.workOrderData.workOrderStatus,
+          amount5: workOrderStatusConvert(this.workOrderData.workOrderStatus),
         },
       ];
     },
@@ -203,5 +207,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.el-textarea{
+  width: 50%;
+}
 </style>
   

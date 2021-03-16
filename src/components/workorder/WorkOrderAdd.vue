@@ -4,32 +4,33 @@
       :active="active"
       finish-status="success"
       simple
-      style="margin-top: 20px"
+      style="margin-top: 10px"
     >
-      <el-step title="选择问题所属产品"></el-step>
       <el-step title="选择问题类型"></el-step>
-      <el-step title="推荐解决方案"></el-step>
+      <!-- <el-step title="推荐解决方案"></el-step> -->
       <el-step title="创建工单"></el-step>
     </el-steps>
-    <div>
+    <div class="qq" v-if="active == 1">
+      <div v-for="product in productList" :key="product.id" class="flatContent">
+        <div>
+          <span>{{ product.productName }}</span>
+        </div>
+        <div>
+          <el-button type="plain" plain @click="ask(product)"
+            >提问</el-button
+          >
+        </div>
+      </div>
+    </div>
+    <div class="selectDataForm" v-if="active == 2">
+      
       <el-form ref="form" :model="selectData" label-width="80px">
-        <el-form-item label="您已选择">
-          <el-input
+        <span class="sp">您已选择   问题类型 : {{selectData.productName}}</span>
+        <el-input
             prop="productId"
             v-model="selectData.productId"
             type="hidden"
           ></el-input>
-          <el-button type="info" plain>{{ selectData.productName }}</el-button>
-          <i class="el-icon-arrow-right"></i>
-          <el-button type="info" plain>{{ selectData.categoryName }}</el-button>
-          <!-- <el-input v-model="selectData.productName" :disabled="true"></el-input> -->
-          <el-input
-            prop="categoryId"
-            v-model="selectData.categoryId"
-            type="hidden"
-          ></el-input>
-          <!-- <el-input v-model="selectData.categoryName" :disabled="true"></el-input> -->
-        </el-form-item>
         <el-form-item label="优先级" prop="workOrderType">
           <el-radio-group v-model="selectData.workOrderType">
             <el-radio :label="0">重要</el-radio>
@@ -55,17 +56,54 @@
   </div>
 </template>
 
+<style  lang="scss" scoped>
+.flatContent {
+  width: 32%;
+  height: 100%;
+  align-items: center;
+  background: rgb(247, 243, 243);
+  display: flex;
+  margin-top: 4px;
+  justify-content: space-between;
+  > div {
+    display: flex;
+  }
+  margin: 10px 0;
+}
+.qq {
+  display: flex;
+  flex: 1;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+.selectDataForm{
+  margin: 10vh 13vh 13vh 7vh;
+}
+.el-textarea{
+    width: 50%
+}
+.sp{
+    font-size: 14px;
+    color: #606266;
+    padding: 0 4vh;
+}
+</style>
+
 <script>
 import axios from "@/utils/axios";
 import qs from "qs";
 
 export default {
+  components: {},
   data() {
     return {
-      active: 4,
+      active: 1,
+      productList: [
+        { id: "603cd092b399c319e47eaa34", productName: "社交云" },
+        { id: "603cd092b399c319e47eaa44", productName: "服务云" },
+      ],
       selectData: {
-        categoryId: "603cd0f7b399c319e47eaa3a",
-        categoryName: "服务响应慢",
         productId: "603cd092b399c319e47eaa33",
         productName: "市场云",
         workOrderType: 0,
@@ -73,7 +111,7 @@ export default {
     };
   },
   mounted() {
-    this.initData();
+    this.renderData();
   },
   methods: {
     // 提交表单
@@ -98,22 +136,21 @@ export default {
         })
         .catch((err) => {});
     },
-    // 初始化数据
-    initData() {
-      // 获取路由传递的参数
-      let params = this.$route.query.selectData;
-      this.selectData.categoryId = params.categoryId;
-      this.selectData.categoryName = params.categoryName;
-      this.selectData.productId = params.productId;
-      this.selectData.productName = params.productName;
-      this.selectData.workOrderType = 0;
-      console.log(this.selectData);
+    // 渲染数据
+    renderData() {
+      let params = {};
+      axios.get("/workOrder/belongProduct", params).then((res) => {
+        // console.log(res.data.data);
+        this.productList = res.data.data;
+      });
+    },
+    // 提问按钮
+    ask(product) {
+      console.log(product);
+      this.active = 2;
+      this.selectData.productId = product.id;
+      this.selectData.productName = product.productName;
     },
   },
 };
 </script>
-
-<style lang="sass" scoped>
-.el-textarea
-  width: 50%
-</style>

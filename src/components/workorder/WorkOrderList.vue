@@ -42,105 +42,103 @@
         <el-button type="primary" @click.native="searchData">查询</el-button>
       </el-form-item>
     </el-form>
-    <el-table :data="tableData" style="width: 100%">
-      <el-table-column
-        type="selection"
-        fixed
-        prop="index"
-        label="行号"
-        width="50"
-      >
-      </el-table-column>
-      <el-table-column prop="workOrderNo" label="工单编号" width="150">
-      </el-table-column>
-      <el-table-column prop="content" label="问题内容" width="120">
-      </el-table-column>
-      <el-table-column
-        prop="category.categoryName"
-        label="问题分类"
-        width="120"
-      >
-      </el-table-column>
-      <el-table-column prop="submitAccount" label="提交账号" width="120">
-      </el-table-column>
-      <el-table-column
-        prop="submitTime"
-        label="提交时间"
-        width="300"
-        :formatter="dateFormat"
-      >
-      </el-table-column>
-      <el-table-column prop="workOrderStatus" label="状态" width="120">
-      </el-table-column>
-      <el-table-column prop="workOrderType" label="工单类型" width="120">
-      </el-table-column>
-      <el-table-column fixed="right" label="操作" width="300">
-        <template slot-scope="scope">
-          <el-button
-            @click.native.prevent="showDetail(scope.$index, tableData)"
-            type="text"
-            size="small"
-          >
-            查看
-          </el-button>
-          <el-button
-            @click.native.prevent="deleteRow(scope.$index, tableData)"
-            type="text"
-            size="small"
-          >
-            删除
-          </el-button>
-          <el-button
-            @click.native.prevent="feedback(scope.$index, tableData)"
-            type="text"
-            size="small"
-            v-if="clientOpShow"
-          >
-            提交反馈
-          </el-button>
-          <el-button
-            @click.native.prevent="replay(scope.$index, tableData)"
-            type="text"
-            size="small"
-            v-if="postsaleOpShow"
-          >
-            反馈回复
-          </el-button>
-          <el-button
-            @click.native.prevent="evaluate(scope.$index, tableData)"
-            type="text"
-            size="small"
-            v-if="clientOpShow"
-          >
-            评价
-          </el-button>
-          <el-button
-            @click.native.prevent="solveAndClose(scope.$index, tableData)"
-            type="text"
-            size="small"
-            v-if="postsaleOpShow"
-          >
-            关闭工单
-          </el-button>
-        </template>
-      </el-table-column>
-    </el-table>
-    <div style="text-align: center; margin-top: 30px">
-      <el-pagination
-        @size-change="handleSizeChange($event)"
-        @current-change="handleCurrentChange($event)"
-        :current-page="currentPage"
-        :page-sizes="[50, 100, 150, 200, 250, 300]"
-        :page-size="pageSize"
-        layout="total, sizes, prev, pager, next, jumper"
-        :total="total"
-      >
-      </el-pagination>
+    <div ref="tableCot">
+      <el-table :data="tableData" style="width: 100%" :height="Height">
+        <el-table-column
+          type="selection"
+          fixed
+          prop="index"
+          label="行号"
+          width="50"
+        >
+        </el-table-column>
+        <el-table-column prop="workOrderNo" label="工单编号" width="90" align="left">
+        </el-table-column>
+        <el-table-column prop="content" label="问题内容" width="100" align="left" :show-overflow-tooltip="true">
+        </el-table-column>
+        <el-table-column
+          prop="belongProduct.productName"
+          label="问题分类"
+          width="120"
+          align="center"
+        >
+        </el-table-column>
+        <el-table-column prop="submitAccount" label="提交账号" width="170" align="left">
+        </el-table-column>
+        <el-table-column
+          prop="submitTime"
+          label="提交时间"
+          width="200"
+          :formatter="dateFormat"
+          align="center"
+        >
+        </el-table-column>
+        <el-table-column prop="workOrderStatus" label="状态" width="100" align="left" :formatter="workOrderStatusConvert">
+        </el-table-column>
+        <el-table-column prop="workOrderType" label="工单类型" width="100" align="left" :formatter="workOrderTypeConvert">
+        </el-table-column>
+        <el-table-column fixed="right" label="操作" width="300">
+          <template slot-scope="scope">
+            <el-button
+              @click.native.prevent="showDetail(scope.$index, tableData)"
+              type="text"
+            >
+              查看
+            </el-button>
+            <el-button
+              @click.native.prevent="deleteRow(scope.$index, tableData)"
+              type="text"
+            >
+              删除
+            </el-button>
+            <el-button
+              @click.native.prevent="feedback(scope.$index, tableData)"
+              type="text"
+              v-if="clientOpShow"
+            >
+              提交反馈
+            </el-button>
+            <el-button
+              @click.native.prevent="replay(scope.$index, tableData)"
+              type="text"
+              v-if="postsaleOpShow"
+            >
+              反馈回复
+            </el-button>
+            <el-button
+              @click.native.prevent="evaluate(scope.$index, tableData)"
+              type="text"
+              v-if="clientOpShow"
+            >
+              评价
+            </el-button>
+            <el-button
+              @click.native.prevent="solveAndClose(scope.$index, tableData)"
+              type="text"
+              v-if="postsaleOpShow"
+            >
+              关闭工单
+            </el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+      <div style="text-align: center; margin-top: 30px">
+        <el-pagination
+          @size-change="handleSizeChange($event)"
+          @current-change="handleCurrentChange($event)"
+          :current-page="currentPage"
+          :page-sizes="[50, 100, 150, 200, 250, 300]"
+          :page-size="pageSize"
+          layout="total, sizes, prev, pager, next, jumper"
+          :total="total"
+        >
+        </el-pagination>
+      </div>
     </div>
   </div>
 </template>
 
-<style>
+<style lang="sass" scoped>
 </style>
 
 <script>
@@ -163,6 +161,8 @@ function getQueryString(name) {
 export default {
   data() {
     return {
+      // table的高度
+      Height: 510,
       status: getQueryString("status"),
       tableData: [],
       searchFormData: {
@@ -209,6 +209,18 @@ export default {
       },
     };
   },
+  created() {
+    //  this.$nextTick(function () {
+    //   const that = this;
+    //   window.onresize = () => {
+    //     return (() => {
+    //       console.log(that.$refs.tableCot);
+    //       let heightStyle = that.$refs.tableCot.offsetHeight;
+    //       that.Height = heightStyle;
+    //     })();
+    //   };
+    // });
+  },
   mounted() {
     // 初始化调用加载表格数据
     let params = new Object();
@@ -227,6 +239,17 @@ export default {
       this.clientOpShow = false;
       this.postsaleOpShow = true;
     }
+    // 设置table的高度自适应外部div高度
+    // this.$nextTick(function () {
+    //   const that = this;
+    //   window.onresize = () => {
+    //     return (() => {
+    //       console.log("============>>offsetHeight:"+that.$refs.tableCot.offsetHeight);
+    //       let heightStyle = that.$refs.tableCot.offsetHeight-100;
+    //       that.Height = heightStyle;
+    //     })();
+    //   };
+    // });
   },
   //   .执行到它的时候时候是数据发生变化且界面更新完毕
   // .所有的数据发生变化都会调用
@@ -248,7 +271,7 @@ export default {
   // 数据发生改变的时候会侦听到
   watch: {
     //监听status数据的变化
-    status(newVal,oldVal){
+    status(newVal, oldVal) {
       let params = new Object();
       params.pageNo = this.currentPage;
       params.pageSize = this.pageSize;
@@ -395,6 +418,38 @@ export default {
         ":" +
         dt.getSeconds()
       );
+    },
+    // 工单类型转化
+    workOrderTypeConvert(row, column, cellValue, index){
+      // console.log(cellValue);
+      if(cellValue == 0){
+        return "重要工单";
+      }else if(cellValue == 1){
+        return "普通工单";
+      }else{
+        return "";
+      }
+    },
+    // 工单状态转化
+    workOrderStatusConvert(row, column, cellValue, index){
+      // console.log(cellValue);
+      if(cellValue == 0){
+        return "已创建";
+      }else if(cellValue == 1){
+        return "待反馈";
+      }else if(cellValue == 2){
+        return "已反馈";
+      }else if(cellValue == 3){
+        return "处理中";
+      }else if(cellValue == 4){
+        return "待评价";
+      }else if(cellValue == 5){
+        return "已评价";
+      }else if(cellValue == 6){
+        return "已关闭";
+      }else{
+        return "";
+      }
     },
     // 改变每页条数
     handleSizeChange(val) {

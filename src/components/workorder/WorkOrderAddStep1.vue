@@ -12,19 +12,56 @@
       <el-step title="创建工单"></el-step>
     </el-steps>
 
-    <el-tag
+    <!-- <el-tag
       v-for="product in productList"
       :key="product.id"
       @click="ask($event, product.id)"
       type="success"
     >
-      {{ product.productName }}
-      提问
-    </el-tag>
+      <div>
+        <div  v-for="product in productList"
+      :key="product.id">
+          {{ product.productName }}
+          <el-button type="plain" plain @click="ask($event, product.id)">提问</el-button>
+        </div>
+      </div>
+    </el-tag> -->
+    <div class="qq">
+      <div v-for="product in productList" :key="product.id" class="flatContent">
+        <div>
+          <span>{{ product.productName }}</span>
+        </div>
+        <div>
+          <el-button type="plain" plain @click="ask($event, product.id)"
+            >提问</el-button
+          >
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
-<style scoped>
+<style  lang="scss" scoped>
+.flatContent {
+  width: 32%;
+  height: 100%;
+  align-items: center;
+  background: rgb(247, 243, 243);
+  display: flex;
+  margin-top: 4px;
+  justify-content: space-between;
+  > div {
+    display: flex;
+  }
+  margin: 10px 0;
+}
+.qq {
+  display: flex;
+  flex: 1;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
 </style>
 
 <script>

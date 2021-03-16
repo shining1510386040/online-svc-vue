@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-table :data="tableData" style="width: 100%">
+    <el-table :data="tableData" style="width: 100%;" height="630">
       <el-table-column
         type="selection"
         fixed
@@ -23,38 +23,80 @@
         v-if="false"
       >
       </el-table-column>
-      <el-table-column prop="feedbackAccount" label="反馈账号" width="150">
+      <el-table-column prop="feedbackAccount" label="反馈账号" width="120" align="left"  :show-overflow-tooltip="true">
       </el-table-column>
-      <el-table-column prop="leaveMessage" label="反馈留言" width="120">
+      <el-table-column prop="leaveMessage" label="反馈留言" width="120" align="left"  :show-overflow-tooltip="true">
       </el-table-column>
       <el-table-column
         prop="feedbackTime"
         label="反馈时间"
-        width="300"
+        width="150"
         :formatter="dateFormat"
+        align="center"
       >
       </el-table-column>
-      <el-table-column prop="secretInfo" label="机密信息" width="120">
+      <el-table-column prop="secretInfo" label="机密信息" width="120" align="left"  :show-overflow-tooltip="true">
       </el-table-column>
-      <el-table-column prop="attach" label="附件" width="120">
+      <el-table-column label="附件" width="200" align="left">
+        <template scope="scope">
+          <el-image
+            :src="scope.row.attach1"
+            :preview-src-list="[scope.row.attach1]"
+            style="width: 40px; height: 40px"
+            class="head_pic"
+            v-if="scope.row.attach1 != null"
+          ></el-image>
+          &nbsp; &nbsp;
+          <el-image
+            :src="scope.row.attach2"
+            :preview-src-list="[scope.row.attach2]"
+            style="width: 40px; height: 40px"
+            class="head_pic"
+            v-if="scope.row.attach2 != null"
+          ></el-image
+          >&nbsp; &nbsp;
+          <el-image
+            :src="scope.row.attach3"
+            :preview-src-list="[scope.row.attach3]"
+            style="width: 40px; height: 40px"
+            class="head_pic"
+            v-if="scope.row.attach3 != null"
+          ></el-image
+          >&nbsp; &nbsp;
+          <el-image
+            :src="scope.row.attach4"
+            :preview-src-list="[scope.row.attach4]"
+            style="width: 40px; height: 40px"
+            class="head_pic"
+            v-if="scope.row.attach4 != null"
+          ></el-image
+          >&nbsp; &nbsp;
+          <el-image
+            :src="scope.row.attach5"
+            :preview-src-list="[scope.row.attach5]"
+            style="width: 40px; height: 40px"
+            class="head_pic"
+            v-if="scope.row.attach5 != null"
+          ></el-image>
+        </template>
       </el-table-column>
-      <el-table-column prop="replayMessage" label="回复消息" width="120">
+      <el-table-column prop="replayMessage" label="回复消息" width="120" align="left"  :show-overflow-tooltip="true">
       </el-table-column>
-      <el-table-column prop="replyAccount" label="回复账号" width="120">
+      <el-table-column prop="replyAccount" label="回复账号" width="120" align="left"  :show-overflow-tooltip="true">
       </el-table-column>
       <el-table-column
         prop="replyTime"
         label="回复时间"
-        width="200"
+        width="150"
         :formatter="dateFormat"
+        align="left"
       >
       </el-table-column>
-      <el-table-column fixed="right" label="操作" width="300">
+      <el-table-column fixed="right" label="操作" width="100">
         <template slot-scope="scope">
           <el-button
             @click.native.prevent="replayMsg(scope.$index, tableData)"
             type="text"
-            size="small"
           >
             回复
           </el-button>
@@ -121,7 +163,7 @@ import qs from "qs";
 export default {
   data() {
     return {
-      id:this.$route.query.id,
+      id: this.$route.query.id,
       tableData: [],
       editForm: {},
       editFormVisible: false,

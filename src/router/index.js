@@ -5,7 +5,7 @@ import NotFound from '@/components/error/notFound.vue'
 import Login from '@/components/login/login.vue'
 import HOME from '@/views/home/index.vue' //主页
 import WorkOrderAddStep1 from '@/components/workorder/WorkOrderAddStep1.vue'
-
+import WorkOrderAdd from '@/components/workorder/WorkOrderAdd.vue'
 import WorkOrderAddStep2 from '@/components/workorder/WorkOrderAddStep2.vue'
 import WorkOrderAddStep4 from '@/components/workorder/workOrderAddStep4.vue'
 import WorkOrderList from '@/components/workorder/WorkOrderList.vue'
@@ -26,6 +26,9 @@ const routes = [
     component: HOME,
     children: [
       {
+        path: "/workOrder/add",
+        component: WorkOrderAdd
+      },{
         path: "/workOrder/add/step1",
         component: WorkOrderAddStep1
       }, {

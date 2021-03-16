@@ -31,7 +31,7 @@
       </section>
     </div>
     <div class="communicate">
-      <el-card class="box-card">
+      <el-card class="box-card" shadow="never">
         <div slot="header" class="clearfix">
           <span>沟通记录</span>
         </div>
@@ -55,10 +55,47 @@
               <div>
                 <span>{{ communicate.leaveMessage }}</span>
               </div>
+              <div class="demo-image__preview">
+                <el-image
+                  style="width: 100px; height: 100px"
+                  :src="communicate.attach1"
+                  :preview-src-list="[communicate.attach1]"
+                  v-if="communicate.attach1 != null"
+                >
+                </el-image>
+                <el-image
+                  style="width: 100px; height: 100px"
+                  :src="communicate.attach2"
+                  :preview-src-list="[communicate.attach2]"
+                  v-if="communicate.attach2 != null"
+                >
+                </el-image>
+                <el-image
+                  style="width: 100px; height: 100px"
+                  :src="communicate.attach3"
+                  :preview-src-list="[communicate.attach3]"
+                  v-if="communicate.attach3 != null"
+                >
+                </el-image>
+                <el-image
+                  style="width: 100px; height: 100px"
+                  :src="communicate.attach4"
+                  :preview-src-list="[communicate.attach4]"
+                  v-if="communicate.attach4 != null"
+                >
+                </el-image>
+                <el-image
+                  style="width: 100px; height: 100px"
+                  :src="communicate.attach5"
+                  :preview-src-list="[communicate.attach5]"
+                  v-if="communicate.attach5 != null"
+                >
+                </el-image>
+              </div>
             </div>
           </div>
           <div class="right">
-            <div>
+            <div v-if="communicate.replayMessage != null">
               <div>
                 <span
                   ><el-avatar
@@ -83,7 +120,7 @@
 import axios from "@/utils/axios";
 import qs from "qs";
 
-import { formatDate } from "@/utils/common.js";
+import { workOrderStatusConvert, formatDate } from "@/utils/common.js";
 
 export default {
   data() {
@@ -104,7 +141,8 @@ export default {
           amount2: "工单编号",
           amount3: this.workOrderData.workOrderNo,
           amount4: "工单类型",
-          amount5: this.workOrderData.workOrderType,
+          amount5:
+            this.workOrderData.workOrderType == 0 ? "重要工单" : "普通工单",
         },
         {
           name: "提交账号",
@@ -115,7 +153,7 @@ export default {
             "yyyy-MM-dd hh:mm:ss"
           ),
           amount4: "状态",
-          amount5: this.workOrderData.workOrderStatus,
+          amount5: workOrderStatusConvert(this.workOrderData.workOrderStatus),
         },
       ];
     },
@@ -181,7 +219,7 @@ export default {
   overflow: hidden;
   > div {
     display: flex;
-    height: 80px;
+    height: 180px;
   }
   .left {
     align-items: flex-start;

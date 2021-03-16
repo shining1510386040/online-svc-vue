@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-card class="box-card">
+    <el-card class="box-card" shadow="never">
       <div slot="header" class="clearfix">
         <span>我要反馈</span>
       </div>
@@ -8,18 +8,20 @@
         :model="feedbackForm"
         :rules="rules"
         ref="feedbackForm"
-        label-width="100px"
+        label-width="130px"
         class="demo-ruleForm"
       >
         <el-form-item label="留言(必填项)" prop="leaveMessage">
           <el-input
             type="textarea"
+             rows="5"
             v-model="feedbackForm.leaveMessage"
           ></el-input>
         </el-form-item>
         <el-form-item label="机密信息" prop="secretInfo">
           <el-input
             type="textarea"
+            rows="5"
             v-model="feedbackForm.secretInfo"
           ></el-input>
         </el-form-item>
@@ -202,4 +204,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.el-textarea{
+  width: 50%;
+}
 </style>
